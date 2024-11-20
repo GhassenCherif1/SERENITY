@@ -8,6 +8,7 @@ from typing_extensions import TypedDict
 from langgraph.graph.message import add_messages
 import streamlit as st
 
+
 load_dotenv()
 llm = ChatGroq(
     model="llama-3.1-70b-versatile",
@@ -37,19 +38,41 @@ SERENITY_SYSINT = (
     "the user should consult a professional for a proper diagnosis and treatment."
 )
 
+# This is the message with which the system opens the conversation.
+WELCOME_MSG = "Welcome to SERENITY. Type `q` to quit. How can I help you today?"
 
+from langchain_core.messages.ai import AIMessage
+from typing import Literal
 
+def human(state: OrderState) -> OrderState:
+    """The human node. This node waits for a human message and then passes it to the chatbot."""
+    user_msg = input("You:")
+    if(user_msg in ["q", "quit" , "exit" , "goodbye"]):
+        state["finished"] = True
+    return state | {"messages": [user_msg]}
 
 def chatbot_with_welcome_msg(state: OrderState) -> OrderState:
-    response = llm.invoke([SERENITY_SYSINT] + state["messages"])
-    return {"messages": [response]}
+    if state["messages"]:
+        new_output = llm.invoke([SERENITY_SYSINT] + state["messages"])
+    else:
+        new_output = AIMessage(content=WELCOME_MSG)
+    print(new_output.content)
+    return state | {"messages": [new_output]}
 
+def maybe_exit_human_node(state: OrderState):
+    """Route to the chatbot, unless it looks like the user is exiting."""
+    if state.get("finished",False):
+        return END
+    else:
+        return "chatbot"
 
 graph_builder = StateGraph(OrderState)
 graph_builder.add_node("chatbot", chatbot_with_welcome_msg)
+graph_builder.add_node("human", human)
 graph_builder.add_edge(START, "chatbot")
-graph_builder.add_edge("chatbot", END)
-chatbot = graph_builder.compile()
+graph_builder.add_edge("chatbot", "human")
+graph_builder.add_conditional_edges("human", maybe_exit_human_node)
+chat_with_human_graph = graph_builder.compile()
 
-def invoke_our_graph(st_messages):
-    return chatbot.invoke({"messages": st_messages})
+state = chat_with_human_graph.invoke({"messages": []})
+print(state)
