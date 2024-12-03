@@ -56,7 +56,9 @@ def chatbot_with_welcome_msg(state: OrderState) -> OrderState:
         new_output = llm.invoke([SERENITY_SYSINT] + state["messages"])
     else:
         new_output = AIMessage(content=WELCOME_MSG)
-    print(new_output.content)
+    color = "\033[32m"  # Green color
+    reset = "\033[0m"   # Reset to default
+    print(color+new_output.content+reset)
     return state | {"messages": [new_output]}
 
 def maybe_exit_human_node(state: OrderState):
