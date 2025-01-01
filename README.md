@@ -14,7 +14,7 @@
 
 
 ## Demo
-
+You can explore the live version of Serenity by visiting [this link](https://serenity-2ncqtftif75uj2dtkpngjf.streamlit.app/).
 ![SERENITY In Action](https://github.com/GhassenCherif1/SERENITY/blob/master/Demo.gif)
 
 
