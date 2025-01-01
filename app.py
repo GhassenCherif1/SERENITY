@@ -2,7 +2,6 @@ from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 import os
 from langgraph.graph import StateGraph, START, END
-from pprint import pprint
 from typing import Annotated
 from typing_extensions import TypedDict
 from langgraph.graph.message import add_messages
