@@ -5,4 +5,3 @@ typing
 typing_extensions
 streamlit
 python-dotenv
-os
