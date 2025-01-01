@@ -4,5 +4,5 @@ langgraph
 typing
 typing_extensions
 streamlit
-dotenv
+python-dotenv
 os
